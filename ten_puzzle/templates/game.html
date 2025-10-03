@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10パズル - モックアップ</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="header">
+        <h1>10パズル</h1>
+        <div class="progress">123 / 552 問クリア</div>
+      </div>
+
+      <div class="game-area">
+        <div class="status-message">数字を選んで計算しよう！</div>
+
+        <div class="numbers-section">
+          <div class="section-title">使える数字</div>
+          <div class="number-buttons">
+            <button class="btn-number original">{{ data.number1}}</button>
+            <button class="btn-number original selected">{{ data.number2}}</button>
+            <button class="btn-number result">{{ data.number3}}</button>
+            <button class="btn-number original">{{ data.number4}}</button>
+          </div>
+        </div>
+
+        <div class="operators-section">
+          <div class="section-title">演算子</div>
+          <div class="operator-buttons">
+            <button class="btn-operator">+</button>
+            <button class="btn-operator">−</button>
+            <button class="btn-operator">×</button>
+            <button class="btn-operator">÷</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-control btn-skip">スキップ</button>
+        <button class="btn-control btn-reset">リセット</button>
+        <button class="btn-control btn-option">⚙️</button>
+      </div>
+    </div>
+
+    <script>
+      // モックアップ用のインタラクション
+      document.querySelectorAll(".btn-number").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          document
+            .querySelectorAll(".btn-number")
+            .forEach((b) => b.classList.remove("selected"));
+          this.classList.add("selected");
+        });
+      });
+
+      document.querySelectorAll(".btn-operator").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          alert("演算子: " + this.textContent);
+        });
+      });
+    </script>
+  </body>
+</html>
