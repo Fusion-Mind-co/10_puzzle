@@ -11,8 +11,9 @@
     <div class="game-container">
       <div class="header">
         <h1>10パズル</h1>
-        <div class="progress">問題 {{cleared_count}} / 552 </div>
+        <div class="progress">問題 {{cleared_count}} / 552</div>
       </div>
+      <h1>{{data.id}}</h1>
 
       <div class="game-area">
         <div class="status-message">数字を選んで計算しよう！</div>
@@ -20,10 +21,10 @@
         <div class="numbers-section">
           <div class="section-title">使える数字</div>
           <div class="number-buttons">
-            <button class="btn-number original">{{ data.number1}}</button>
-            <button class="btn-number original selected">{{ data.number2}}</button>
-            <button class="btn-number original">{{ data.number3}}</button>
-            <button class="btn-number original">{{ data.number4}}</button>
+            <button class="btn-number original">{{ data.number1 }}</button>
+            <button class="btn-number original">{{ data.number2 }}</button>
+            <button class="btn-number original">{{ data.number3 }}</button>
+            <button class="btn-number original">{{ data.number4 }}</button>
           </div>
         </div>
 
@@ -46,16 +47,15 @@
     </div>
 
     <script>
-      // モックアップ用のインタラクション
-      document.querySelectorAll(".btn-number").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          document
-            .querySelectorAll(".btn-number")
-            .forEach((b) => b.classList.remove("selected"));
-          this.classList.add("selected");
-        });
-      });
-
+      const data = {
+        id: {{ data.id }},
+        number1: {{ data.number1 }},
+        number2: {{ data.number2 }},
+        number3: {{ data.number3 }},
+        number4: {{ data.number4 }},
+      };
     </script>
+
+    <script src="{% static 'js/game.js' %}"></script>
   </body>
 </html>
