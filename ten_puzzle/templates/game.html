@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
   </head>
   <body>
+    {% csrf_token %}
     <div class="game-container">
       <div class="header">
         <h1>10パズル</h1>
         <div class="progress">問題 {{cleared_count}} / 552</div>
       </div>
-      <h1>{{data.id}}</h1>
 
       <div class="game-area">
         <div class="status-message">数字を選んで計算しよう！</div>
