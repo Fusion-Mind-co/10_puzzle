@@ -5,17 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10パズル</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/title.css' %}">
 </head>
 <body>
-    <div class="title-container">
-        <h1 class="title-logo">10パズル</h1>
-        <p class="title-description">4つの数字を使って10を作ろう！</p>
-        
-        <div class="title-buttons">
-            <a href="{% url 'login' %}" class="btn-title btn-login">ログイン</a>
-            <a href="{% url 'signup' %}" class="btn-title btn-signup">新規登録</a>
+    <div class="title-background">
+        <div class="floating-numbers">
+            <span class="number">1</span>
+            <span class="number">2</span>
+            <span class="number">3</span>
+            <span class="number">4</span>
+            <span class="number">5</span>
+            <span class="number">6</span>
+            <span class="number">7</span>
+            <span class="number">8</span>
+            <span class="number">9</span>
+            <span class="number">+</span>
+            <span class="number">−</span>
+            <span class="number">×</span>
+            <span class="number">÷</span>
         </div>
     </div>
+
+    <div class="title-container">
+        <div class="title-content">
+            <div class="logo-section">
+                <h1 class="title-logo">
+                    <span class="logo-number">10</span>
+                    <span class="logo-text">パズル</span>
+                </h1>
+                <p class="title-tagline">4つの数字で10を作ろう</p>
+            </div>
+
+            <div class="description-box">
+                <p class="description-text">
+                    📱 4つの数字と四則演算を使って<br>
+                    🎯 答えが10になるように計算！<br>
+                    🧠 全549問に挑戦しよう
+                </p>
+            </div>
+
+            <div class="button-section">
+                <a href="{% url 'login' %}" class="btn-main btn-login">
+                    <span class="btn-icon">🎮</span>
+                    <span class="btn-text">ログイン</span>
+                </a>
+                <a href="{% url 'signup' %}" class="btn-main btn-signup">
+                    <span class="btn-icon">✨</span>
+                    <span class="btn-text">新規登録</span>
+                </a>
+            </div>
+
+            <div class="footer-info">
+                <p>© 2025 10パズル</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/title.js' %}"></script>
 </body>
 </html>
