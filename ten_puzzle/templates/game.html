@@ -15,13 +15,21 @@
         <div class="header-left">
           <h1>10パズル</h1>
         </div>
+        <!-- templates/game.html のヘッダー部分 -->
         <div class="header-right">
-          <span class="user-name">{{ user.name }}</span>
+          <div class="user-info">
+            {% if user.crown_display %}
+            <span class="crown-display">{{ user.crown_display }}</span>
+            {% endif %}
+            <span class="user-name">{{ user.name }}</span>
+          </div>
           <a href="{% url 'logout' %}" class="btn-logout-small">ログアウト</a>
         </div>
       </div>
 
-      <div class="progress">問題 {{ current_problem_number }} / {{ total_problems }}</div>
+      <div class="progress">
+        問題 {{ current_problem_number }} / {{ total_problems }}
+      </div>
 
       <div class="game-area">
         <div class="status-message">数字を選んで計算しよう！</div>
@@ -50,7 +58,6 @@
       <div class="controls">
         <button class="btn-control btn-skip">スキップ</button>
         <button class="btn-control btn-reset">リセット</button>
-        <button class="btn-control btn-option">⚙️</button>
       </div>
     </div>
 

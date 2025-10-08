@@ -48,12 +48,69 @@ body {
   gap: 15px;
 }
 
+/* static/css/style.css */
+
+/* ユーザー情報 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.crown-display {
+  font-size: 18px;
+  /* アニメーション削除 */
+}
+
 .user-name {
   font-weight: bold;
   font-size: 16px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  color: white;
+}
+
+
+
+.btn-logout-small {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.btn-logout-small:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .header-right {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .user-info {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .crown-display {
+    font-size: 18px;
+  }
 }
 
 .btn-logout-small {

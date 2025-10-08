@@ -1,3 +1,4 @@
+<!-- templates/all_cleared.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,18 +7,313 @@
     <title>全問クリア！ - 10パズル</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .all-cleared-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* 紙吹雪アニメーション */
+        .confetti {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 花火エフェクト */
+        .fireworks {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: explode 1.5s ease-out forwards;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
+        
+        /* メインコンテンツ */
+        .all-cleared-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 3;
+            animation: bounceIn 0.8s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .all-cleared-title {
+            font-size: 64px;
+            margin-bottom: 30px;
+            font-weight: 900;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                             0 0 30px rgba(255, 215, 0, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+                             0 0 50px rgba(255, 215, 0, 0.8);
+            }
+        }
+        
+        .crown-display {
+            font-size: 100px;
+            margin: 30px 0;
+            display: inline-block;
+            animation: crownBounce 1s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+        
+        @keyframes crownBounce {
+            0%, 100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        .all-cleared-count {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 30px 0;
+            padding: 20px 40px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            display: inline-block;
+            border: 3px solid rgba(255, 215, 0, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            }
+        }
+        
+        .celebration-message {
+            font-size: 24px;
+            margin: 20px 0;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .all-cleared-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+        
+        .btn-next-round, .btn-logout {
+            padding: 18px 45px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-next-round {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+        }
+        
+        .btn-next-round:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+        
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 3px solid white;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 星キラキラエフェクト */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            color: white;
+            font-size: 20px;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* レスポンシブ */
+        @media (max-width: 600px) {
+            .all-cleared-title {
+                font-size: 40px;
+            }
+            
+            .crown-display {
+                font-size: 60px;
+            }
+            
+            .all-cleared-count {
+                font-size: 32px;
+                padding: 15px 30px;
+            }
+            
+            .all-cleared-content {
+                padding: 40px 30px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- 紙吹雪 -->
+    <div class="confetti"></div>
+    
+    <!-- 花火 -->
+    <div class="fireworks"></div>
+    
+    <!-- 星キラキラ -->
+    <div class="stars"></div>
+    
     <div class="all-cleared-container">
-        <div class="confetti"></div>
-        
-        <h1 class="all-cleared-title">🎊 全問クリア！ 🎊</h1>
-        <p class="all-cleared-message">おめでとうございます！</p>
-        <p class="all-cleared-count">{{ all_cleared_count }}周目達成！</p>
-        
-        <div class="all-cleared-buttons">
-            <a href="{% url 'game_page' %}" class="btn-next-round">次の周回へ</a>
-            <a href="{% url 'settings' %}" class="btn-settings">設定</a>
+        <div class="all-cleared-content">
+            <h1 class="all-cleared-title">🎊 全問クリア！ 🎊</h1>
+            
+            {% if user.crown_display %}
+            <div class="crown-display">
+                {{ user.crown_display }}
+            </div>
+            {% endif %}
+            
+            <div class="all-cleared-count">
+                {{ all_cleared_count }}周目達成！
+            </div>
+            
+            <p class="celebration-message">
+                おめでとうございます！🎉
+            </p>
+            
+            <div class="all-cleared-buttons">
+                <a href="{% url 'game_page' %}" class="btn-next-round">次の周回へ 🚀</a>
+                <a href="{% url 'logout' %}" class="btn-logout">ログアウト</a>
+            </div>
         </div>
     </div>
     

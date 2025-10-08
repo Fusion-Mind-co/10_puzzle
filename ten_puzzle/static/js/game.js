@@ -35,8 +35,6 @@ const STORAGE_KEY = `game_state_${currentProblemData.id}`;
 // ページ読み込み時
 window.onload = function () {
   console.log("ページが読み込まれました！");
-  
-  // ローカルストレージから状態を復元
   loadGameState();
 };
 
@@ -49,8 +47,6 @@ function initGame() {
 
   console.log("ゲーム初期化:", gameState.availableNumbers);
   setupEventListeners();
-  
-  // 初期状態を保存
   saveGameState();
 }
 
@@ -75,16 +71,13 @@ function loadGameState() {
       const state = JSON.parse(savedState);
       console.log("保存された状態を復元:", state);
       
-      // 状態を復元
       gameState.availableNumbers = state.availableNumbers;
       gameState.phase = state.phase;
       
-      // ボタンを再描画
       renderButtons();
       setupEventListeners();
       updateStatusMessage("数字を選んで計算しよう！");
       
-      // 最終フェーズかチェック
       if (gameState.availableNumbers.length === 1) {
         checkGameResult();
       }
@@ -94,7 +87,6 @@ function loadGameState() {
       initGame();
     }
   } else {
-    // 保存された状態がない場合は初期化
     console.log("保存された状態がないため、初期化します");
     initGame();
   }
@@ -108,24 +100,19 @@ function clearGameState() {
 
 // イベントリスナー設定
 function setupEventListeners() {
-  // 数字ボタンのクリック
   document.addEventListener("click", function (e) {
     if (e.target.classList.contains("btn-number")) {
       handleNumberClick(e.target);
     }
   });
 
-  // 演算子ボタンのクリック
   document.querySelectorAll(".btn-operator").forEach((btn) => {
     btn.addEventListener("click", function () {
       handleOperatorClick(this);
     });
   });
 
-  // リセットボタン
   document.querySelector(".btn-reset").addEventListener("click", resetGame);
-  
-  // スキップボタン
   document.querySelector(".btn-skip").addEventListener("click", skipProblem);
 }
 
@@ -238,7 +225,6 @@ function calculate(num1, operator, num2, index1, index2) {
   renderButtons();
   gameState.phase++;
   
-  // 状態を保存
   saveGameState();
 
   if (gameState.availableNumbers.length === 1) {
@@ -312,8 +298,7 @@ function checkGameResult() {
   }
 }
 
-
-// stage_clearのfetch部分を修正
+// ステージクリアを記録
 function stageClear() {
   console.log("stageClear関数実行");
   
@@ -335,13 +320,12 @@ function stageClear() {
           location.reload();
         }, 2000);
       } else if (result.status === 'all_cleared') {
-        // 全クリ演出
         updateStatusMessage(result.message);
         clearGameState();
         
         setTimeout(() => {
-          location.href = "/game/";  // all_cleared.htmlへ
-        }, 3000);
+          showAllClearedPage();
+        }, 2000);
       }
     })
     .catch((error) => console.error(error));
@@ -367,10 +351,7 @@ function skipProblem() {
       console.log(result);
       
       if (result.status === 'success') {
-        // ローカルストレージをクリア
         clearGameState();
-        
-        // 次の問題へ
         location.reload();
       }
     })
@@ -400,10 +381,7 @@ function resetGame() {
     return;
   }
   
-  // ローカルストレージをクリア
   clearGameState();
-  
-  // ページをリロード
   location.reload();
 }
 
@@ -415,5 +393,142 @@ function updateStatusMessage(message) {
   statusElement.style.color = "#0066cc";
 }
 
-// ページ読み込み時に初期化は不要(window.onloadで処理)
-// document.addEventListener("DOMContentLoaded", initGame);
+// 全クリページを表示
+function showAllClearedPage() {
+  document.body.innerHTML = `
+    <div class="confetti"></div>
+    <div class="fireworks"></div>
+    <div class="stars"></div>
+    
+    <div class="all-cleared-container">
+        <div class="all-cleared-content">
+            <h1 class="all-cleared-title">🎊 全問クリア！ 🎊</h1>
+            <div class="all-cleared-count">達成おめでとう！</div>
+            <p class="celebration-message">おめでとうございます！🎉</p>
+            <div class="all-cleared-buttons">
+                <a href="/game/" class="btn-next-round">次の周回へ 🚀</a>
+                <a href="/logout/" class="btn-logout">ログアウト</a>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        body { margin: 0; overflow: hidden; }
+        .all-cleared-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 20px; position: relative; }
+        .confetti { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
+        .confetti-piece { position: absolute; width: 10px; height: 10px; animation: fall linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        .fireworks { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 2; }
+        .firework { position: absolute; width: 4px; height: 4px; border-radius: 50%; animation: explode 1.5s ease-out forwards; }
+        @keyframes explode { 0% { transform: translate(0, 0); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)); opacity: 0; } }
+        .stars { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
+        .star { position: absolute; color: white; font-size: 20px; animation: twinkle 2s ease-in-out infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1); } }
+        .all-cleared-content { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); border-radius: 30px; padding: 60px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); position: relative; z-index: 3; animation: bounceIn 0.8s ease-out; }
+        @keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); opacity: 1; } }
+        .all-cleared-title { font-size: 64px; margin-bottom: 30px; font-weight: 900; text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); animation: glow 2s ease-in-out infinite; }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 215, 0, 0.5); } 50% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 50px rgba(255, 215, 0, 0.8); } }
+        .all-cleared-count { font-size: 48px; font-weight: bold; margin: 30px 0; padding: 20px 40px; background: rgba(255, 215, 0, 0.3); border-radius: 20px; display: inline-block; border: 3px solid rgba(255, 215, 0, 0.5); animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); } 50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); } }
+        .celebration-message { font-size: 24px; margin: 20px 0; }
+        .all-cleared-buttons { display: flex; gap: 20px; margin-top: 40px; flex-wrap: wrap; justify-content: center; }
+        .btn-next-round, .btn-logout { padding: 18px 45px; font-size: 20px; font-weight: bold; text-decoration: none; border-radius: 50px; transition: all 0.3s ease; display: inline-block; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
+        .btn-next-round { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; }
+        .btn-next-round:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5); }
+        .btn-logout { background: rgba(255, 255, 255, 0.2); color: white; border: 3px solid white; }
+        .btn-logout:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-5px); }
+    </style>
+  `;
+  
+  createConfetti();
+  createStars();
+  launchFireworks();
+  playVictorySound();
+}
+
+function createConfetti() {
+    const container = document.querySelector('.confetti');
+    if (!container) return;
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#ffd700', '#ff69b4', '#00d2ff'];
+    for (let i = 0; i < 150; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.top = Math.random() * -50 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        confetti.style.width = (Math.random() * 10 + 5) + 'px';
+        confetti.style.height = (Math.random() * 10 + 5) + 'px';
+        container.appendChild(confetti);
+    }
+}
+
+function createStars() {
+    const container = document.querySelector('.stars');
+    if (!container) return;
+    const starSymbols = ['⭐', '✨', '💫', '🌟'];
+    for (let i = 0; i < 30; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.textContent = starSymbols[Math.floor(Math.random() * starSymbols.length)];
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        container.appendChild(star);
+    }
+}
+
+function launchFireworks() {
+    const container = document.querySelector('.fireworks');
+    if (!container) return;
+    const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#8b00ff', '#ff69b4'];
+    function createFirework() {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight * 0.6;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'firework';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.backgroundColor = color;
+            const angle = (Math.PI * 2 * i) / 30;
+            const velocity = 50 + Math.random() * 100;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            particle.style.setProperty('--tx', tx + 'px');
+            particle.style.setProperty('--ty', ty + 'px');
+            container.appendChild(particle);
+            setTimeout(() => particle.remove(), 1500);
+        }
+    }
+    createFirework();
+    let count = 0;
+    const interval = setInterval(() => {
+        createFirework();
+        count++;
+        if (count >= 20) clearInterval(interval);
+    }, 500);
+}
+
+function playVictorySound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, index) => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = freq;
+            oscillator.type = 'sine';
+            const startTime = audioContext.currentTime + index * 0.2;
+            gainNode.gain.setValueAtTime(0.3, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+            oscillator.start(startTime);
+            oscillator.stop(startTime + 0.5);
+        });
+    } catch (e) {}
+}

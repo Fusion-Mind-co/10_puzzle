@@ -32,23 +32,43 @@ class User(AbstractUser):
     
     @property
     def is_all_cleared(self):
-        return len(self.cleared_problem_ids) >= 552
+        """全問クリア済みか"""
+        return len(self.cleared_problem_ids) >= 549
     
     @property
     def cleared_count(self):
+        """クリア済み問題数"""
         return len(self.cleared_problem_ids)
     
+    @property
+    def crown_display(self):
+        """王冠の表示"""
+        if self.all_cleared_count == 0:
+            return ""
+        elif self.all_cleared_count == 1:
+            return "👑"
+        elif self.all_cleared_count == 2:
+            return "👑👑"
+        else:
+            return f"👑×{self.all_cleared_count}"
+
+    
+
+    
     def mark_problem_cleared(self, problem_id):
+        """問題をクリア済みにする"""
         if problem_id not in self.cleared_problem_ids:
             self.cleared_problem_ids.append(problem_id)
             self.save(update_fields=['cleared_problem_ids'])
     
     def reset_progress(self):
+        """進行状況をリセット"""
         self.cleared_problem_ids = []
         self.now_playing_id = None
         self.save(update_fields=['cleared_problem_ids', 'now_playing_id'])
     
     def complete_all_clear(self):
+        """全問クリア達成時の処理"""
         self.all_cleared_count += 1
         self.cleared_problem_ids = []
         self.now_playing_id = None
@@ -56,6 +76,7 @@ class User(AbstractUser):
 
 
 class Problem(models.Model):
+    """問題マスタ"""
     number1 = models.IntegerField()
     number2 = models.IntegerField()
     number3 = models.IntegerField()
