@@ -1,9 +1,10 @@
+<!-- templates/game.html -->
 <!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>10パズル - モックアップ</title>
+    <title>10パズル</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
   </head>
@@ -11,9 +12,16 @@
     {% csrf_token %}
     <div class="game-container">
       <div class="header">
-        <h1>10パズル</h1>
-        <div class="progress">問題 {{cleared_count}} / 552</div>
+        <div class="header-left">
+          <h1>10パズル</h1>
+        </div>
+        <div class="header-right">
+          <span class="user-name">{{ user.name }}</span>
+          <a href="{% url 'logout' %}" class="btn-logout-small">ログアウト</a>
+        </div>
       </div>
+
+      <div class="progress">問題 {{ current_problem_number }} / {{ total_problems }}</div>
 
       <div class="game-area">
         <div class="status-message">数字を選んで計算しよう！</div>

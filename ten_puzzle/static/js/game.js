@@ -312,7 +312,8 @@ function checkGameResult() {
   }
 }
 
-// ステージクリアを記録
+
+// stage_clearのfetch部分を修正
 function stageClear() {
   console.log("stageClear関数実行");
   
@@ -329,15 +330,18 @@ function stageClear() {
       console.log(result);
       
       if (result.status === 'success') {
-        // ローカルストレージをクリア
         clearGameState();
-        
-        // 2秒後に次の問題へ
         setTimeout(() => {
           location.reload();
         }, 2000);
       } else if (result.status === 'all_cleared') {
-        updateStatusMessage("🎊 全問クリアおめでとうございます！ 🎊");
+        // 全クリ演出
+        updateStatusMessage(result.message);
+        clearGameState();
+        
+        setTimeout(() => {
+          location.href = "/game/";  // all_cleared.htmlへ
+        }, 3000);
       }
     })
     .catch((error) => console.error(error));

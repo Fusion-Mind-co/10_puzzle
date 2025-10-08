@@ -1,0 +1,22 @@
+<!-- templates/no_problems.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>問題未登録 - 10パズル</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="error-container">
+        <h1>⚠️ 問題が登録されていません</h1>
+        <p>{{ message }}</p>
+        
+        <div class="action-buttons">
+            <a href="/admin/" class="btn-admin">管理画面へ</a>
+            <a href="{% url 'logout' %}" class="btn-logout">ログアウト</a>
+        </div>
+    </div>
+</body>
+</html>

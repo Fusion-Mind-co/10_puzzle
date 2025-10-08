@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全問クリア！ - 10パズル</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="all-cleared-container">
+        <div class="confetti"></div>
+        
+        <h1 class="all-cleared-title">🎊 全問クリア！ 🎊</h1>
+        <p class="all-cleared-message">おめでとうございます！</p>
+        <p class="all-cleared-count">{{ all_cleared_count }}周目達成！</p>
+        
+        <div class="all-cleared-buttons">
+            <a href="{% url 'game_page' %}" class="btn-next-round">次の周回へ</a>
+            <a href="{% url 'settings' %}" class="btn-settings">設定</a>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/all_cleared.js' %}"></script>
+</body>
+</html>

@@ -1,95 +1,112 @@
+# ten_puzzle/management/commands/import_problems.py
 import csv
 from django.core.management.base import BaseCommand
 from ten_puzzle.models import Problem
 
 
 class Command(BaseCommand):
-    help = 'CSVファイルから問題データをインポートします'
+    help = 'CSVファイルから問題をインポート'
 
     def add_arguments(self, parser):
         parser.add_argument(
             'csv_file',
             type=str,
-            help='インポートするCSVファイルのパス'
+            default='10_puzzel.csv',
+            nargs='?',
+            help='CSVファイルのパス'
         )
 
     def handle(self, *args, **options):
         csv_file = options['csv_file']
         
-        # 既存のデータを削除するか確認
-        if Problem.objects.exists():
-            self.stdout.write(
-                self.style.WARNING(
-                    f'既に{Problem.objects.count()}件のデータが存在します。'
-                )
-            )
-            confirm = input('既存データを削除してインポートしますか？ (yes/no): ')
-            if confirm.lower() == 'yes':
-                Problem.objects.all().delete()
-                self.stdout.write(self.style.SUCCESS('既存データを削除しました'))
-            else:
-                self.stdout.write(self.style.ERROR('インポートをキャンセルしました'))
-                return
-
-        # CSVを読み込んでインポート
-        imported_count = 0
-        skipped_count = 0
+        # 除外する問題
+        exclude_list = [
+            (1, 3, 3, 7),
+            (1, 1, 9, 9),
+            (1, 1, 5, 8),
+        ]
+        
+        # 既存の問題を削除
+        Problem.objects.all().delete()
+        self.stdout.write(self.style.WARNING('既存の問題を削除しました'))
+        
+        problems = []
+        skipped = []
+        line_count = 0
         
         try:
             with open(csv_file, 'r', encoding='utf-8') as file:
-                reader = csv.reader(file)
+                csv_reader = csv.reader(file)
+                # ヘッダー行のスキップを削除！
+                # next(csv_reader)  # ← この行を削除またはコメントアウト
                 
-                for row in reader:
-                    if len(row) != 4:
-                        self.stdout.write(
-                            self.style.WARNING(f'スキップ: {row} (4つの数字が必要)')
-                        )
-                        skipped_count += 1
+                for row in csv_reader:
+                    line_count += 1
+                    
+                    # 空行をスキップ
+                    if not row or len(row) < 4:
                         continue
                     
                     try:
-                        number1, number2, number3, number4 = map(int, row)
+                        num1 = int(row[0].strip())
+                        num2 = int(row[1].strip())
+                        num3 = int(row[2].strip())
+                        num4 = int(row[3].strip())
                         
-                        # 重複チェック
-                        if Problem.objects.filter(
-                            number1=number1,
-                            number2=number2,
-                            number3=number3,
-                            number4=number4
-                        ).exists():
-                            skipped_count += 1
+                        # 除外リストのチェック
+                        problem_tuple = tuple(sorted([num1, num2, num3, num4]))
+                        if problem_tuple in exclude_list:
+                            skipped.append(f"{num1}, {num2}, {num3}, {num4}")
                             continue
                         
-                        Problem.objects.create(
-                            number1=number1,
-                            number2=number2,
-                            number3=number3,
-                            number4=number4
-                        )
-                        imported_count += 1
-                        
-                    except ValueError as e:
+                        problems.append(Problem(
+                            number1=num1,
+                            number2=num2,
+                            number3=num3,
+                            number4=num4,
+                        ))
+                    
+                    except (ValueError, IndexError) as e:
                         self.stdout.write(
-                            self.style.WARNING(f'スキップ: {row} (数値変換エラー)')
+                            self.style.ERROR(f'行{line_count}のスキップ: {row} - {e}')
                         )
-                        skipped_count += 1
                         continue
             
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f'インポート完了: {imported_count}件'
-                )
-            )
-            if skipped_count > 0:
-                self.stdout.write(
-                    self.style.WARNING(f'スキップ: {skipped_count}件')
-                )
-                
+            self.stdout.write(f"\n読み込んだ行数: {line_count}")
+            self.stdout.write(f"追加する問題数: {len(problems)}")
+            
+            # 一括作成
+            Problem.objects.bulk_create(problems, ignore_conflicts=True)
+            
+            count = Problem.objects.count()
+            
+            self.stdout.write(self.style.SUCCESS(
+                f'\n✅ {count}個の問題をインポートしました！'
+            ))
+            
+            if skipped:
+                self.stdout.write(self.style.WARNING(
+                    f'\n⚠️  除外した問題（{len(skipped)}個）:'
+                ))
+                for problem in skipped:
+                    self.stdout.write(f'  - {problem}')
+            
+            # 期待値との比較
+            expected = line_count - len(skipped)
+            if count == expected:
+                self.stdout.write(self.style.SUCCESS(
+                    f'\n✅ 完璧！期待値と一致しています'
+                ))
+            else:
+                self.stdout.write(self.style.WARNING(
+                    f'\n⚠️  期待値: {expected}問、実際: {count}問、差分: {expected - count}問'
+                ))
+        
         except FileNotFoundError:
-            self.stdout.write(
-                self.style.ERROR(f'ファイルが見つかりません: {csv_file}')
-            )
+            self.stdout.write(self.style.ERROR(
+                f'\n❌ ファイルが見つかりません: {csv_file}'
+            ))
         except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'エラー: {str(e)}')
-            )
+            self.stdout.write(self.style.ERROR(
+                f'\n❌ エラーが発生しました: {e}'
+            ))

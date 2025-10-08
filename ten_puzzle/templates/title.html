@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10パズル</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="title-container">
+        <h1 class="title-logo">10パズル</h1>
+        <p class="title-description">4つの数字を使って10を作ろう！</p>
+        
+        <div class="title-buttons">
+            <a href="{% url 'login' %}" class="btn-title btn-login">ログイン</a>
+            <a href="{% url 'signup' %}" class="btn-title btn-signup">新規登録</a>
+        </div>
+    </div>
+</body>
+</html>
