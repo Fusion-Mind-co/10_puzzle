@@ -1,34 +1,13 @@
-
 import os
 from pathlib import Path
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# データベース設定
-if os.environ.get('DATABASE_URL'):
-    # 本番環境（Render） - PostgreSQL
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
-    # 開発環境（ローカル） - SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-z74ml7)canh0%cnq(@1hs-4anz2r&1h7*4$tggm%%o^dn@*uv1')
 
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-SECRET_KEY = 'django-insecure-z74ml7)canh0%cnq(@1hs-4anz2r&1h7*4$tggm%%o^dn@*uv1'
-
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else []
 
 # カスタムユーザーモデルを使用
 AUTH_USER_MODEL = 'ten_puzzle.User'
@@ -39,7 +18,14 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # パスワード検証（簡略化する場合）
-AUTH_PASSWORD_VALIDATORS = []  # 開発時は空でOK
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 4,
+        }
+    },
+]
 
 # セッション設定
 SESSION_COOKIE_AGE = 86400 * 30  # 30日間
@@ -57,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # 追加
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,32 +72,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ten_puzzle_project.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# データベース設定
+if os.environ.get('DATABASE_URL'):
+    # 本番環境（Render） - PostgreSQL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
-
-# config/settings.py
-
-# パスワード検証（日本語メッセージ付き）
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 4,  # 開発時は短くてもOK
+else:
+    # 開発環境（ローカル） - SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
-    },
-]
+    }
 
 LANGUAGE_CODE = 'ja'
 TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 USE_TZ = True
 
-
-STATIC_URL = 'static/'
-
+# 静的ファイル設定
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
